@@ -28,6 +28,7 @@ const initialState = {
 class SortableFlatList extends Component {
   _moveAnim = new Animated.Value(0)
   _offset = new Animated.Value(0)
+  _scale = new Animated.Value(1)
   _hoverAnim = Animated.add(this._moveAnim, this._offset)
   _spacerIndex = -1
   _pixels = []
@@ -119,6 +120,13 @@ class SortableFlatList extends Component {
         const offset = horizontal ? x : y
         const pos = offset - this._scrollOffset + this._additionalOffset + (isLastElement ? size : 0)
         const activeItemSize = horizontal ? activeMeasurements.width : activeMeasurements.height
+                                             
+        Animated.timing(this._scale, {
+          duration: 250,
+          useNativeDriver: true,
+          toValue: 1,
+        }).start()
+                           
         this._releaseVal = pos - (isAfterActive ? activeItemSize : 0)
         if (this._releaseAnim) this._releaseAnim.stop()
         this._releaseAnim = Animated.spring(this._moveAnim, {
@@ -311,7 +319,12 @@ class SortableFlatList extends Component {
     return !!hoverComponent && (
       <Animated.View style={[
         horizontal ? styles.hoverComponentHorizontal : styles.hoverComponentVertical,
-        { transform: [horizontal ? { translateX: this._hoverAnim } : { translateY: this._hoverAnim }] }]} >
+        { transform: [
+            horizontal ? { translateX: this._hoverAnim } : { translateY: this._hoverAnim },
+            { scale: this._scale },
+          ] 
+        }]} 
+      >
         {hoverComponent}
       </Animated.View>
     )
@@ -335,6 +348,14 @@ class SortableFlatList extends Component {
   componentDidUpdate = (prevProps, prevState) => {
     if (prevProps.extraData !== this.props.extraData) {
       this.setState({ extraData: this.props.extraData })
+    }
+
+    if (!!this.props.activeScale && !!this.state.hoverComponent) {
+      Animated.timing(this._scale, {
+        duration: 250,
+        useNativeDriver: true,
+        toValue: this.props.activeScale,
+      }).start()
     }
   }
 
