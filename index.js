@@ -173,7 +173,8 @@ class SortableFlatList extends Component {
     const scrollRatio = scrollPercent / 100
     if (activeRow === -1) return
     const nextSpacerIndex = this.getSpacerIndex(this._move, activeRow)
-    if (nextSpacerIndex > -1 && nextSpacerIndex !== this._spacerIndex) {
+    const canDropToIndex = this.props.disableDropIntoRows.indexOf(nextSpacerIndex) < 0
+    if (canDropToIndex && nextSpacerIndex > -1 && nextSpacerIndex !== this._spacerIndex) {
       LayoutAnimation.easeInEaseOut()
       this.setState({ spacerIndex: nextSpacerIndex })
       this._spacerIndex = nextSpacerIndex
@@ -370,6 +371,7 @@ SortableFlatList.defaultProps = {
   scrollPercent: 5,
   scrollSpeed:5,
   contentContainerStyle: {},
+  disableDropIntoRows: []
 }
 
 class RowItem extends PureComponent {
