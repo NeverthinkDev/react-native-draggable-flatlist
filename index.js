@@ -48,6 +48,7 @@ class SortableFlatList extends Component {
     super(props)
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponderCapture: (evt, gestureState) => {
+        if (this._releaseAnim !== null) { return false }
         const { pageX, pageY } = evt.nativeEvent
         const { horizontal } = this.props
         const tappedPixel = horizontal ? pageX : pageY
@@ -76,6 +77,7 @@ class SortableFlatList extends Component {
         return false
       },
       onMoveShouldSetPanResponder: (evt, gestureState) => {
+        if (this._releaseAnim !== null) { return false }
         const { activeRow } = this.state
         const { horizontal } = this.props
         const { moveX, moveY } = gestureState
@@ -92,6 +94,7 @@ class SortableFlatList extends Component {
       },
       onPanResponderMove: Animated.event([null, { [props.horizontal ? 'moveX' : 'moveY']: this._moveAnim }], {
         listener: (evt, gestureState) => {
+          if (this._releaseAnim !== null) { return }
           const { moveX, moveY } = gestureState
           const { horizontal } = this.props
           this._move = horizontal ? moveX : moveY
@@ -99,6 +102,7 @@ class SortableFlatList extends Component {
       }),
       onPanResponderTerminationRequest: ({ nativeEvent }, gestureState) => false,
       onPanResponderRelease: () => {
+        if (this._releaseAnim !== null) { return }
         const { activeRow, spacerIndex } = this.state
         const { data, horizontal } = this.props
         const activeMeasurements = this._measurements[activeRow]
